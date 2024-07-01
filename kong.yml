@@ -1,0 +1,54 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: authentication
+    host: ms-user
+    port: 8080
+    protocol: http
+    path: /auth
+    routes:
+      - name: sign-in
+        methods:
+          - POST
+        paths:
+          - /auth/sign-in
+        strip_path: true
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /sign-in
+
+      - name: sign-up
+        methods:
+          - POST
+        paths:
+          - /auth/sign-up
+        strip_path: true
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /sign-up
+
+  - name: ms-user
+    host: ms-user
+    port: 8080
+    protocol: http
+    path: /ms-user
+    plugins:
+      - name: jwt
+        enabled: true
+    routes:
+      - name: me
+        methods:
+          - GET
+        paths:
+          - /ms-user/me
+        strip_path: true
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /users/$(headers["X-Consumer-Custom-ID"])
