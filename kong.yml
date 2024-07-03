@@ -40,6 +40,10 @@ services:
     plugins:
       - name: jwt
         enabled: true
+        config:
+          key_claim_name: iss
+          claims_to_verify:
+            - exp
     routes:
       - name: me
         methods:
