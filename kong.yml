@@ -6,7 +6,6 @@ services:
     host: ms-user
     port: 8080
     protocol: http
-    path: /auth
     routes:
       - name: sign-in
         methods:
@@ -36,7 +35,6 @@ services:
     host: ms-user
     port: 8080
     protocol: http
-    path: /ms-user
     plugins:
       - name: jwt
         enabled: true
@@ -49,10 +47,255 @@ services:
         methods:
           - GET
         paths:
-          - /ms-user/me
+          - /auth/me
         strip_path: true
         plugins:
           - name: request-transformer
             config:
               replace:
                 uri: /users/$(headers["X-Consumer-Custom-ID"])
+
+  - name: ms-store
+    host: ms-store
+    port: 8080
+    protocol: http
+    plugins:
+      - name: jwt
+        enabled: true
+        config:
+          key_claim_name: iss
+          claims_to_verify:
+            - exp
+    routes:
+      - name: product-details
+        methods:
+          - GET
+        paths:
+          - /product-details
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /products/$(query_params["id"])
+      - name: product-index
+        methods:
+          - GET
+        paths:
+          - /product-index
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /products
+      - name: tag-index
+        methods:
+          - GET
+        paths:
+          - /tag-index
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /tags
+      - name: order-index
+        methods:
+          - GET
+        paths:
+          - /order-index
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /orders
+      - name: order-store
+        methods:
+          - POST
+        paths:
+          - /order-store
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /orders
+
+  - name: ms-user-address
+    host: ms-user-address
+    port: 8080
+    protocol: http
+    plugins:
+      - name: jwt
+        enabled: true
+        config:
+          key_claim_name: iss
+          claims_to_verify:
+            - exp
+    routes:
+      - name: address-index
+        methods:
+          - GET
+        paths:
+          - /address-index
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /users/$(headers["X-Consumer-Custom-ID"])/addresses
+      - name: address-store
+        methods:
+          - POST
+        paths:
+          - /address-store
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /users/$(headers["X-Consumer-Custom-ID"])/addresses
+      - name: default-address
+        methods:
+          - GET
+        paths:
+          - /default-address
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /users/$(headers["X-Consumer-Custom-ID"])/addresses/default
+      - name: address-update
+        methods:
+          - PUT
+        paths:
+          - /address-update
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /users/$(headers["X-Consumer-Custom-ID"])/addresses/$(query_params["id"])
+      - name: address-delete
+        methods:
+          - DELETE
+        paths:
+          - /address-delete
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /users/$(headers["X-Consumer-Custom-ID"])/addresses/$(query_params["id"])
+
+  - name: ms-credit-card
+    host: ms-credit-card
+    port: 8080
+    protocol: http
+    plugins:
+      - name: jwt
+        enabled: true
+        config:
+          key_claim_name: iss
+          claims_to_verify:
+            - exp
+    routes:
+      - name: credit-card-index
+        methods:
+          - GET
+        paths:
+          - /credit-card-index
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /user/$(headers["X-Consumer-Custom-ID"])
+      - name: credit-card-store
+        methods:
+          - POST
+        paths:
+          - /credit-card-store
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /
+      - name: credit-card-delete
+        methods:
+          - DELETE
+        paths:
+          - /credit-card-delete
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /$(query_params["id"])
+
+  - name: ms-promotional-banner
+    host: ms-promotional-banner
+    port: 8080
+    protocol: http
+    plugins:
+      - name: jwt
+        enabled: true
+        config:
+          key_claim_name: iss
+          claims_to_verify:
+            - exp
+    routes:
+      - name: promotional-banner-index
+        methods:
+          - GET
+        paths:
+          - /promotional-banner-index
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /banners
+
+  - name: ms-subscription
+    host: ms-subscription
+    port: 8080
+    protocol: http
+    plugins:
+      - name: jwt
+        enabled: true
+        config:
+          key_claim_name: iss
+          claims_to_verify:
+            - exp
+    routes:
+      - name: subscription-index
+        methods:
+          - GET
+        paths:
+          - /subscription-index
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /subscrptions
+      - name: subscription-product-index
+        methods:
+          - GET
+        paths:
+          - /subscription-product-index
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /subscrptions/$(query_params["id"])/ultimas-cachacas
+      - name: user-subscription-details
+        methods:
+          - GET
+        paths:
+          - /user-subscription-details
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /subsByUser/$(headers["X-Consumer-Custom-ID"])
+      - name: user-subscription-store
+        methods:
+          - POST
+        paths:
+          - /user-subscription-store
+        plugins:
+          - name: request-transformer
+            config:
+              replace:
+                uri: /subsByUser/$(headers["X-Consumer-Custom-ID"])/$(query_params["id"])
